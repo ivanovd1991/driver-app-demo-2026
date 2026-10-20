@@ -37,6 +37,14 @@ const originalRender=render;
 render=function(){
  moneyReady();if(db.userId&&moneyCharge(db.userId))persist();
  originalRender();
+ if(db.userId&&!session()){
+  const main=$('app').querySelector('main');
+  const jobs=db.orders.filter(x=>x.driverId===db.userId&&x.status==='assigned').slice(-4).reverse();
+  const instructions=db.messages.filter(x=>x.driverId===db.userId&&x.kind==='in').slice(-3).reverse();
+  if(main&&main.insertAdjacentHTML)main.insertAdjacentHTML('afterbegin','<div class="card"><h2>📋 Полученные наряды</h2><p class="muted">Наряд можно прочитать вечером, не открывая смену и не списывая суточные. Работа начнётся только с фактического старта.</p>'+
+   (jobs.map(x=>'<div class="note mb"><b>'+h(x.id)+' · '+h(x.cargo)+'</b><div class="shortinfo">'+h(x.from)+' → '+h(x.to||'назначение уточняется')+'</div>'+(x.plannedDate?'<div class="small">План погрузки: '+h(x.plannedDate)+'</div>':'')+(x.driverRate?'<div class="small">Внутренняя ставка: '+num(x.driverRate)+' грн/т</div>':'')+'</div>').join('')||'<div class="empty">Новых нарядов пока нет</div>')+
+   (instructions.length?'<h3>Последние инструкции</h3>'+instructions.map(x=>'<div class="small mt">'+h(x.message)+'</div>').join(''):'')+'</div>');
+ }
  if(page==='money'&&session()){
   const m=$('app').querySelector('main.main');if(m)m.innerHTML=driverWalletHTML();
   const title=$('app').querySelector('header h1');if(title)title.textContent='Мои деньги';
