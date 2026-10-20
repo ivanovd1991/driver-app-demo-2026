@@ -79,9 +79,12 @@ submitKind=async function(kind){
   db.cashEvents.push({id:'C'+Date.now()+Math.random().toString(36).slice(2,5),driverId:db.userId,type:'advance',amount:amt,issuer:val('moneyIssuer'),method:val('moneyMethod'),note:val('note'),at:when(),status:'reported'});
   record('Получение заявлено · на проверке',num(amt)+' грн');saveSuccess();return;
  }
+ const driverBefore=db.userId;
  const isStarting=kind==='start'&&trip()?.status==='assigned';
+ const isReleasing=kind==='release'&&!!driverBefore;
  await originalSubmit(kind);
  if(isStarting&&db.userId){moneyStart(db.userId);persist();render()}
+ if(isReleasing){moneyReady();db.duty[driverBefore]={state:'off',endedAt:when()};persist();render()}
 };
 const originalHandle=handleAction;
 handleAction=function(action){

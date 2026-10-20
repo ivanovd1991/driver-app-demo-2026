@@ -96,7 +96,7 @@ function open(act,id){
   const existing=db.orders.find(x=>x.id===id),p=db.plan.find(x=>x.id===id);
   const o=existing||{};
   modal(existing?'Изменить наряд':'Новый наряд',
-  '<div class="fields"><div>'+select('driverId','Водитель',options(db.drivers),o.driverId||p?.driverId||'d1')+'</div><div>'+input('date','Дата выдачи','', 'type="date" value="'+day()+'"')+'</div><div>'+input('from','Откуда грузим',o.from||p?.place||'','required')+'</div><div>'+input('to','Пункт выгрузки (если известен)',o.to||'')+'</div><div>'+input('cargo','Культура',o.cargo||p?.cargo||'','required')+'</div><div>'+input('customer','Заказчик / хозяин груза',o.customer||'Тест Агро')+'</div><div>'+input('recipient','Фирма сдачи',o.recipient||'')+'</div><div>'+input('driverRate','Внутренняя ставка водителя, грн/т',o.driverRate||'','type="number" min="0" step="1"')+'</div></div>'+
+  '<div class="fields"><div>'+select('driverId','Водитель',options(db.drivers),o.driverId||p?.driverId||'d1')+'</div><div>'+input('date','Дата плановой погрузки',o.plannedDate||p?.date||day(),'type="date"')+'</div><div>'+input('from','Откуда грузим',o.from||p?.place||'','required')+'</div><div>'+input('to','Пункт выгрузки (если известен)',o.to||'')+'</div><div>'+input('cargo','Культура',o.cargo||p?.cargo||'','required')+'</div><div>'+input('customer','Заказчик / хозяин груза',o.customer||'Тест Агро')+'</div><div>'+input('recipient','Фирма сдачи',o.recipient||'')+'</div><div>'+input('driverRate','Внутренняя ставка водителя, грн/т',o.driverRate||'','type="number" min="0" step="1"')+'</div></div>'+
  select('registerForm','Форма реестра', [['','Пока не определена'],['1','1 — Безнал'],['2','2 — Кэш']],o.registerForm||'')+
  textArea('note','Инструкции / где взять ТТН / контакт',o.note||''),
  'order',id);return
@@ -138,7 +138,7 @@ function open(act,id){
   modal('Операции · '+driverName(id),'<h3>Деньги и расходы</h3>'+
   (events.length?events.map(x=>'<div class="soft"><b>'+esc(x.type==='advance'?'Поступление':'Расход')+' · '+UAH(x.amount)+'</b><div class="small">'+esc(x.category||x.issuer||'')+' · '+fmt(x.at)+' · '+esc(x.status)+'</div><div class="muted">'+esc(x.note||'')+'</div>'+
   (jsPhoto(x.photo)?'<img class="thumb" alt="Подтверждение" src="'+x.photo+'">':'')+
-  (x.type==='expense'&&x.status==='pending'?'<div class="actions"><button type="button" class="btn secondary" data-act="expenseApprove" data-id="'+esc(x.id)+'">✓ Подтвердить</button><button type="button" class="btn warn" data-act="expenseReject" data-id="'+esc(x.id)+'">Вернуть</button></div>':'')+'</div>').join(''):'<div class="empty">Операций пока нет</div>')+
+  (x.type==='expense'&&x.status==='pending'?'<div class="actions"><button type="button" class="btn secondary" data-act="expenseApprove" data-id="'+esc(x.id)+'">✓ Подтвердить</button><button type="button" class="btn warn" data-act="expenseReject" data-id="'+esc(x.id)+'">Вернуть</button></div>':'')+(x.type==='advance'&&x.status==='reported'?'<button type="button" class="btn secondary" data-act="moneyConfirmReport" data-id="'+esc(x.id)+'">✓ Сверил выдачу · подтвердить</button>':'')+'</div>').join(''):'<div class="empty">Операций пока нет</div>')+
   '<h3>Суточные</h3>'+allowances.map(x=>'<div class="soft">'+esc(x.day)+' · '+UAH(x.amount)+' · автоматически · '+esc(x.type||'Рабочий день')+'</div>').join('')+
   '<button type="button" data-act="close" class="btn secondary wfull">Закрыть</button>','view',id);return;
  }
@@ -147,7 +147,7 @@ function submit(kind){
  ensure();const id=modalId;
  if(kind==='order'){
   const p=db.plan.find(x=>x.id===id),o=db.orders.find(x=>x.id===id);
-  const r={driverId:mandatory('driverId'),from:mandatory('from'),to:val('to'),cargo:mandatory('cargo'),customer:val('customer'),recipient:val('recipient'),registerForm:val('registerForm'),driverRate:val('driverRate')?Number(val('driverRate')):null,note:val('note')};
+  const r={driverId:mandatory('driverId'),plannedDate:val('date'),from:mandatory('from'),to:val('to'),cargo:mandatory('cargo'),customer:val('customer'),recipient:val('recipient'),registerForm:val('registerForm'),driverRate:val('driverRate')?Number(val('driverRate')):null,note:val('note')};
   if(o){Object.assign(o,r);o.updatedAt=now();o.revision=(o.revision||0)+1;audit('Изменение наряда',o.id)}
   else{const obj={id:'R-'+(db.orderNumber++),status:'assigned',createdAt:now(),ttn:'',loadKg:null,unloadKg:null,photo:null,attachments:[],segments:[],pauses:[],...r};
    db.orders.push(obj);audit('Наряд выдан',obj.id);if(p)p.orderId=obj.id;
@@ -189,6 +189,10 @@ document.addEventListener('click',ev=>{
  if(act==='close'){hideModal();return}
  if(act==='logout'){authenticated=false;sessionStorage.removeItem('logist-demo-session');render();return}
  if(act==='refresh'){reload();return}
+ if(act==='moneyConfirmReport'){
+  db=read();ensure();const x=cashEvent(id);if(!x||x.type!=='advance'||x.status!=='reported')return;
+  x.status='confirmed';x.reviewedAt=now();audit('Получение денег сверено',x.driverId,UAH(x.amount));persist();hideModal();render();return;
+ }
  if(act==='expenseApprove'||act==='expenseReject'){
   db=read();ensure();const x=cashEvent(id);if(!x||x.type!=='expense'||x.status!=='pending')return;
   x.status=act==='expenseApprove'?'approved':'rejected';x.reviewedAt=now();audit(x.status==='approved'?'Расход подтверждён':'Расход возвращён',x.tripId||'',UAH(x.amount));persist();hideModal();render();return;
