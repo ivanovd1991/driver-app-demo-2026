@@ -39,7 +39,7 @@ function startAssignment(s,reason,startOdo){
  db.assignments.push(a);s.assignmentId=a.id;
 }
 function endAssignment(s,endOdo){const a=db.assignments.find(a=>a.id===s.assignmentId&&!a.endAt);if(a){if(!Number.isFinite(endOdo)||endOdo<a.startOdo)throw Error('Одометр передачи меньше начального: '+num(a.startOdo));a.endAt=when();a.endOdo=endOdo}}
-function trip(){return db.orders.find(t=>t.driverId===db.userId&&['active','paused'].includes(t.status))||db.orders.find(t=>t.driverId===db.userId&&t.status==='assigned')||null}
+function trip(){return db.orders.find(t=>t.driverId===db.userId&&['active','paused'].includes(t.status))||db.orders.filter(t=>t.driverId===db.userId&&t.status==='assigned').at(-1)||null}
 function fmtStatus(s){return({assigned:'Получен',active:'В пути',paused:'Пауза',review:'На проверке',done:'Утверждён',interrupted:'Прерван'})[s]||s}
 function badge(s){let c=({assigned:'amber',active:'green',paused:'amber',review:'amber',done:'green',interrupted:'red'})[s]||'';return `<span class="chip ${c}">${h(fmtStatus(s))}</span>`}
 function render(){const u=currentUser(),s=session(),t=trip();const sub=!u?'Выберите тестового водителя':u.name;const title=!u?'Вход водителя':!s?'Начало работы':({trip:'Мои рейсы',docs:'Документы',fuel:'Топливо',history:'История',profile:'Профиль',dispatch:'Логист · демо'})[page];
