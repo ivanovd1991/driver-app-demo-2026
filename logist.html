@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10243d">
+<title>Логист · Transport ERP · Демоверсия</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#172c46;background:#f0f4f9;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}input,select,textarea{width:100%;padding:12px;border:1px solid #ccdae9;border-radius:10px;background:#fff;color:#17324f;min-height:45px}
+textarea{min-height:82px;resize:vertical}label{display:block;font-weight:650;font-size:13px;margin:12px 0 5px}
+h1{font-size:25px;margin:0}h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:0}
+.head{background:linear-gradient(120deg,#0e2543,#22537a);color:#fff;padding:25px 16px 22px;padding-top:max(25px,env(safe-area-inset-top))}
+.head small{opacity:.75}.headrow{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.body{max-width:1100px;padding:14px;margin:auto;padding-bottom:110px}.notice{background:#fff7e3;border:1px solid #f5d995;color:#81551f;padding:12px 14px;border-radius:13px;font-size:13px;line-height:1.45;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.card{background:#fff;border:1px solid #dae4ed;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 3px 12px #112a4410;min-width:0}.soft{background:#f6f9fd;border-radius:12px;padding:12px;margin:10px 0}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row.wrap{flex-wrap:wrap}.muted{color:#5b7088;font-size:13px;line-height:1.45}.small{font-size:12px;color:#6b7e91}.num{font-size:24px;font-weight:800;color:#173c63}.btn{background:#1766af;border:0;border-radius:12px;color:#fff;font-weight:750;padding:12px 15px;min-height:44px;display:inline-block;text-decoration:none;text-align:center}.btn.secondary{background:#e8f1fb;color:#1a5d99}.btn.warn{background:#fce9cc;color:#89551c}.btn:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.actions>*{flex:1 1 130px}.tag{font-size:11px;font-weight:800;padding:5px 9px;border-radius:100px;background:#e9f3fe;color:#245e93;white-space:nowrap}.tag.orange{background:#fff2db;color:#905a1b}.tag.green{background:#e5f9ef;color:#167249}.tag.red{background:#fff0f0;color:#ac3f3f}
+.nav{position:fixed;bottom:0;left:0;right:0;display:flex;overflow-x:auto;gap:3px;background:#fff;border-top:1px solid #dbe6ee;padding:8px 5px max(9px,env(safe-area-inset-bottom));z-index:10;justify-content:center}.nav button{border:0;background:none;border-radius:9px;color:#677b90;padding:8px 9px;font-size:11px;flex:1 0 65px;max-width:130px;font-weight:750}.nav button.active{background:#e7f1fb;color:#145eaa}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 12px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px;min-width:440px}td,th{padding:10px 8px;border-bottom:1px solid #e6edf3;text-align:left;vertical-align:top}th{color:#5f7790;background:#f8fafc}tr:last-child td{border:0}
+.modal-bg{position:fixed;inset:0;z-index:22;background:#0b223d99;display:flex;align-items:flex-end;justify-content:center}.modal{overflow-y:auto;max-height:94vh;width:100%;max-width:700px;background:white;border-radius:20px 20px 0 0;padding:20px;padding-bottom:max(22px,env(safe-area-inset-bottom))}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.close{background:#edf3f8;border:0;border-radius:10px;font-size:22px;padding:5px 14px}
+.thumb{max-height:150px;max-width:120px;object-fit:cover;border-radius:9px;margin:5px;border:1px solid #ddd}.check{display:flex;gap:10px;align-items:flex-start;padding:10px;background:#f1f7fe;border-radius:10px}.check input{width:21px;min-height:21px;flex-shrink:0}.check span{font-size:13px}.empty{text-align:center;color:#6e8092;padding:24px 6px}.route{font-size:16px;font-weight:750;color:#214768}.wfull{width:100%}.space{height:7px}.pill{font-size:12px;display:inline-block;border-radius:8px;padding:4px 8px;background:#eff5fb;color:#39678e}.dangertext{color:#b04c3e}
+@media(min-width:800px){.modal-bg{align-items:center}.modal{border-radius:18px}.body{padding-top:20px}}
+</style>
+</head>
+<body>
+<header class="head"><div class="headrow"><div><small>TRANSPORT ERP · РАБОЧЕЕ МЕСТО</small><h1>Логист · тестовая панель</h1></div><span class="tag">DEMO 4.0</span></div></header>
+<main id="app" class="body"></main>
+<div id="modal"></div>
+<script src="logist.js"></script>
+</body></html>
