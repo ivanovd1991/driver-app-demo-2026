@@ -50,8 +50,8 @@ function cardOrder(o){return '<div class="card"><div class="row wrap"><b>'+esc(o
  '<div class="actions"><button class="btn secondary" data-act="editOrder" data-id="'+esc(o.id)+'">✎ Изменить наряд</button><button class="btn secondary" data-act="directive" data-id="'+esc(o.id)+'">✉ Указание</button>'+(o.status==='review'?'<button class="btn" data-act="review" data-id="'+esc(o.id)+'">✓ Проверить</button>':'')+'</div></div>'}
 function overview(){
  const active=db.orders.filter(x=>x.status==='active'||x.status==='paused').length,pending=db.orders.filter(x=>x.status==='review').length,loads=db.orders.filter(x=>x.loadedAt).length;
- const latest=db.orders.filter(x=>x.loadedAt).slice(-4).reverse();const wallet=db.drivers.map(d=>({d,t:totals(d.id)}));
- return '<div class="grid">'+stat('Ходок в работе',active)+stat('Загружено (всего в демо)',loads)+stat('Документы на проверке',pending)+stat('Запланировано погрузок',db.plan.filter(p=>!p.orderId).length)+'</div>'+
+ const latest=db.orders.filter(x=>x.loadedAt&&!x.cancelledAt&&!x.archivedAt).slice(-4).reverse();const wallet=db.drivers.map(d=>({d,t:totals(d.id)}));
+ return '<div class="grid">'+stat('Ходок в работе',active)+stat('Загружено (всего в демо)',loads)+stat('Документы на проверке',pending)+stat('Открытых закупок',db.plan.filter(p=>!p.archivedAt).length)+'</div>'+
  '<div class="row"><h2>Поступления от водителей</h2><button class="btn secondary" data-go="review">Все →</button></div>'+
  (latest.length?latest.map(x=>cardOrder(x)).join(''):'<div class="card empty">Пока нет подтверждённых загрузок. Создайте наряд и заполните его в приложении водителя.</div>')+
  '<div class="card"><div class="row"><h2>Остатки денег</h2><button class="btn secondary" data-go="money">Открыть</button></div>'+

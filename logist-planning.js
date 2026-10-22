@@ -34,7 +34,7 @@ function readiness(id){
  return {ready:true,reason:'Готов к наряду'};
 }
 function totalsForPlan(p){
- const list=db.orders.filter(o=>o.planId===p.id);
+ const list=db.orders.filter(o=>o.planId===p.id&&!o.cancelledAt);
  let load=0,wheels=0,pending=0,delivered=0,reserved=0,deliveredLoaded=0,pendingLoaded=0;
  for(const o of list){
   if(o.status==='assigned')reserved+=Math.max(0,kg(o.plannedLoadTonnes))*1000;
@@ -80,7 +80,7 @@ function planCard(p){
  (t.weightDifference?'<div class="small">Разница веса погрузки и выгрузки: '+tons(t.weightDifference/1000)+' т</div>':'')+'</div>'+
  '<div class="muted">'+e(p.loading||'Место погрузки не указано')+' → '+e(p.unloading||'выгрузку уточним')+'</div>'+
  '<div class="small">Цена закупки: '+(p.farmerPrice!==''?UAH(p.farmerPrice)+'/т':'—')+' · фрахт доставки: '+(p.freightRate!==''?UAH(p.freightRate)+'/т':'—')+' · внутренняя ставка водителя: '+(p.driverRate!==''?UAH(p.driverRate)+'/т':'—')+'</div>'+alert+
- '<div class="actions"><button class="btn secondary" data-act="editPlan" data-id="'+e(p.id)+'">✎ Закупка</button><button class="btn secondary" data-act="planTrips" data-id="'+e(p.id)+'">🚛 Ходки ('+t.list.length+')</button></div>'+
+ '<div class="actions"><button class="btn secondary" data-act="editPlan" data-id="'+e(p.id)+'">✎ Закупка</button><button class="btn secondary" data-act="planTrips" data-id="'+e(p.id)+'">🚛 Ходки ('+t.list.length+')</button><button class="btn secondary" data-act="togglePlan" data-id="'+e(p.id)+'">'+(p.stoppedAt?'▶ Возобновить':'⏸ Приостановить')+'</button><button class="btn warn" data-act="removePlan" data-id="'+e(p.id)+'">🗑 Удалить</button></div>'+
  '</div>';
 }
 plan=function(){
@@ -111,7 +111,7 @@ cardOrder=function(o){
  return previousCard(o).replace('<div class="route" style="margin-top:8px">','<div class="small">'+(p?'План: '+e(p.supplier)+' · '+e(p.commodity):'Без связи с закупкой · старый учебный наряд')+'</div><div class="route" style="margin-top:8px">');
 };
 overview=function(){
- const t=db.plan.map(totalsForPlan);
+ const t=db.plan.filter(p=>!p.archivedAt).map(totalsForPlan);
  return '<div class="card"><div class="row"><h2>Вывоз по закупкам</h2><button class="btn secondary" data-go="plan">Открыть план →</button></div>'+
  '<div class="grid">'+stat('На колёсах',tons(t.reduce((n,x)=>n+x.wheels,0)/1000)+' т')+
  stat('Выгружено / подтверждено',tons(t.reduce((n,x)=>n+x.delivered,0)/1000)+' т')+'</div></div>'+previousOverview();
@@ -139,7 +139,7 @@ function readyOptions(existing){
 }
 function orderForm(id){
  const o=db.orders.find(x=>x.id===id)||{};
- const availablePlans=db.plan.filter(p=>Number(p.purchasedTonnes)>0&&totalsForPlan(p).availableToAssign>0);
+ const availablePlans=db.plan.filter(p=>Number(p.purchasedTonnes)>0&&!p.archivedAt&&!p.stoppedAt&&totalsForPlan(p).availableToAssign>0);
  const p=db.plan.find(x=>x.id===(o.planId||id))||availablePlans[0];
  const opts=readyOptions(o.id?o:null);
  if(!opts.length){alert('Нет свободных готовых водителей. Проверь статус внизу вкладки «Наряды».');return}
@@ -202,6 +202,7 @@ submit=function(kind){
   const old=db.orders.find(x=>x.id===modalId);
   const planId=old?.planId||mandatory('planRef'),p=db.plan.find(x=>x.id===planId);
   if(!p)throw Error('Выберите действующий план закупки');
+  if(!old&&(p.archivedAt||p.stoppedAt))throw Error('Закупка удалена или приостановлена. Нельзя выдать новый наряд');
   const driver=mandatory('driverId');
   if(!old&&!readiness(driver).ready)throw Error('Водитель уже занят или недоступен, выберите другого');
   if(old&&driver!==old.driverId&&!readiness(driver).ready)throw Error('Для пересадки нужен свободный водитель');
