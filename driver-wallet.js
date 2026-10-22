@@ -1,5 +1,9 @@
 'use strict';
 (function(){
+for(const [driverId,driverName,testPin] of [['d3','Сергей Мельник','3333'],['d4','Андрей Ткаченко','4444']]){
+ if(!db.drivers.some(x=>x.id===driverId))db.drivers.push({id:driverId,name:driverName,pin:testPin});
+}
+persist();
 const moneyDay=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Kyiv',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const moneyReady=()=>{db.cashEvents??=[];db.allowances??=[];db.duty??={}};
 const dutyOf=id=>(db.duty&&db.duty[id]?.state)||'preparing';

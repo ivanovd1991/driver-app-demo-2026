@@ -100,7 +100,7 @@ function availability(){
 orders=function(){
  const ready=db.drivers.filter(d=>readiness(d.id).ready).length;
  return '<div class="row wrap" style="margin-bottom:12px"><div><h2>Наряды водителям</h2><div class="small">Свободных готовых: '+ready+' · каждый наряд связан с закупкой</div></div>'+
- '<button class="btn" data-act="newOrder" '+(!ready?'disabled':'')+'>+ Выдать наряд</button></div>'+
+ '<button class="btn" data-act="newOrder" '+(!ready?'disabled':'')+'>+ Выдать наряд</button><button class="btn secondary" data-go="plan">К закупкам →</button></div>'+
  '<div class="notice">Сначала выбери свободного водителя, затем закупку из плана. Место загрузки, культура и ставки подтянутся; отсутствующие поля можно дополнить или сообщить позже.</div>'+
  (planTripFilter?'<div class="soft"><div class="row"><b>Ходки закупки: '+e(db.plan.find(x=>x.id===planTripFilter)?.supplier||'')+'</b><button class="btn secondary" data-act="planTripsClear">Все наряды</button></div></div>':'')+
  db.orders.filter(o=>!planTripFilter||o.planId===planTripFilter).slice().reverse().map(cardOrder).join('')+
