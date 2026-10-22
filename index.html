@@ -213,4 +213,4 @@ document.addEventListener('submit',async ev=>{const form=ev.target;if(!['loginFo
 window.addEventListener('storage',ev=>{if(ev.key===KEY){try{db=JSON.parse(ev.newValue)||makeDemo()}catch{db=makeDemo()}modal='';render()}});
 window.demoDebug=()=>db; // local test diagnostics only
 render();
-</script><script src="./driver-wallet.js"></script></body></html>
+</script><script src="./driver-wallet.js?v=4.2"></script></body></html>
